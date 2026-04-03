@@ -1,5 +1,7 @@
 package io.github.Lejora.simtools.lai;
 
+import static java.util.Objects.requireNonNull;
+
 public class LacCodec {
     private LacCodec() {}
 
@@ -11,25 +13,23 @@ public class LacCodec {
         // According to 3GPP TS 24.008 v4.17.0:
         // LAC = 0xFFFE or 0x0000 indicates a deleted LAI
         int lac = ((data[offset] & 0xFF) << 8) | (data[offset + 1] & 0xFF);
-        boolean deleted = (lac == 0xFFFE || lac == 0x0000);
 
-        return new Lac(lac, deleted);
+        return new Lac(lac);
     }
 
     public static byte[] encode(Lac lac) {
-        return encode(lac.value(), lac.deleted());
+        requireNonNull(lac, "LAC must not be null");
+        return encode(lac.value());
     }
 
-    public static byte[] encode(int value, boolean deleted) {
+    public static byte[] encode(int value) {
         byte msb = (byte) ((value >> 8) & 0xFF);
         byte lsb = (byte) (value & 0xFF);
 
-        if (deleted) {
-            // on spec, 0xFFFE or 0x0000
-            msb = (byte) 0xFF;
-            lsb = (byte) 0xFE;
-        }
-
         return new byte[] { msb, lsb };
+    }
+
+    public static byte[] encodeDeleted() {
+        return encode(Lac.deleted().value());
     }
 }

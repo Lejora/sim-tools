@@ -9,20 +9,18 @@ public class LaiCodec {
     private LaiCodec() {}
 
     public static Lai decode(byte[] data) {
-        if (data == null || data.length != 5) {
+        return decode(data, 0);
+    }
+
+    public static Lai decode(byte[] data, int offset) {
+        if (data == null || data.length < offset + 5) {
             throw new IllegalArgumentException("LAI must be exactly 5 bytes");
         }
 
-        Plmn plmn = PlmnCodec.decode(data, 0);
-        Lac lac = LacCodec.decode(data, 3);
+        Plmn plmn = PlmnCodec.decode(data, offset);
+        Lac lac = LacCodec.decode(data, offset + 3);
 
-        boolean deleted = lac.deleted() || plmn.abnormal();
-
-        return new Lai(
-                plmn,
-                lac.value(),
-                deleted
-        );
+        return new Lai(plmn, lac.value());
     }
 
     public static byte[] encode(Lai lai) {
@@ -30,7 +28,7 @@ public class LaiCodec {
         Plmn plmn = requireNonNull(lai.plmn(), "PLMN must not be null");
 
         byte[] plmnBytes = PlmnCodec.encode(plmn);
-        byte[] lacBytes = LacCodec.encode(lai.lac(), lai.deleted());
+        byte[] lacBytes = LacCodec.encode(lai.lac());
 
         byte[] laiBytes = new byte[5];
         System.arraycopy(plmnBytes, 0, laiBytes, 0, 3);

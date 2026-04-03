@@ -10,26 +10,24 @@ class LacCodecTest {
     void encodeDecodeRoundTripPreservesValue() {
         int[] values = { 0x0001, 0x1234, 0x7FFE, 0xFFFD };
         for (int value : values) {
-            Lac original = new Lac(value, false);
+            Lac original = new Lac(value);
             byte[] encoded = LacCodec.encode(original);
             assertEquals(2, encoded.length);
 
             Lac decoded = LacCodec.decode(encoded, 0);
             assertEquals(value, decoded.value());
-            assertFalse(decoded.deleted());
+            assertFalse(decoded.isDeletedEncoding());
         }
     }
 
     @Test
-    void encodeMarksDeletedWithSentinelValue() {
-        Lac original = new Lac(0x1111, true);
-
-        byte[] encoded = LacCodec.encode(original);
+    void encodeDeletedUsesSentinelValue() {
+        byte[] encoded = LacCodec.encodeDeleted();
         assertArrayEquals(new byte[] { (byte) 0xFF, (byte) 0xFE }, encoded);
 
         Lac decoded = LacCodec.decode(encoded, 0);
         assertEquals(0xFFFE, decoded.value());
-        assertTrue(decoded.deleted());
+        assertTrue(decoded.isDeletedEncoding());
     }
 
     @Test
@@ -38,6 +36,6 @@ class LacCodecTest {
 
         Lac decoded = LacCodec.decode(deletedBytes, 0);
         assertEquals(0x0000, decoded.value());
-        assertTrue(decoded.deleted());
+        assertTrue(decoded.isDeletedEncoding());
     }
 }

@@ -8,7 +8,7 @@ class PlmnCodecTest {
 
     @Test
     void encodeDecodeRoundTripWithThreeDigitMnc() {
-        Plmn original = new Plmn("310", "260", false);
+        Plmn original = new Plmn("310", "260");
 
         byte[] encoded = PlmnCodec.encode(original);
         assertEquals(3, encoded.length);
@@ -19,7 +19,7 @@ class PlmnCodecTest {
 
     @Test
     void encodeDecodeRoundTripWithTwoDigitMnc() {
-        Plmn original = new Plmn("440", "10", false);
+        Plmn original = new Plmn("440", "10");
 
         byte[] encoded = PlmnCodec.encode(original);
         assertEquals(3, encoded.length);
@@ -30,16 +30,15 @@ class PlmnCodecTest {
     }
 
     @Test
-    void encodeAllowsAbnormalDigitsAndDecodeMarksThem() {
-        Plmn abnormal = new Plmn("A0A", "B1", true);
+    void encodeDecodeRoundTripWithAbnormalDigits() {
+        Plmn abnormal = new Plmn("A0A", "B1");
 
         byte[] encoded = PlmnCodec.encode(abnormal);
         assertEquals(3, encoded.length);
 
         Plmn decoded = PlmnCodec.decode(encoded, 0);
-        assertTrue(decoded.abnormal());
-        assertFalse(decoded.mcc().isBlank());
-        assertFalse(decoded.mnc().isBlank());
+        assertTrue(decoded.isAbnormal());
+        assertEquals(abnormal, decoded);
     }
 
     @Test
@@ -50,7 +49,12 @@ class PlmnCodecTest {
 
     @Test
     void encodeRejectsInvalidLengths() {
-        assertThrows(IllegalArgumentException.class, () -> PlmnCodec.encode(new Plmn("31", "260", false)));
-        assertThrows(IllegalArgumentException.class, () -> PlmnCodec.encode(new Plmn("310", "2", false)));
+        assertThrows(IllegalArgumentException.class, () -> PlmnCodec.encode(new Plmn("31", "260")));
+        assertThrows(IllegalArgumentException.class, () -> PlmnCodec.encode(new Plmn("310", "2")));
+    }
+
+    @Test
+    void constructorRejectsThreeDigitMncUsingFAsThirdDigit() {
+        assertThrows(IllegalArgumentException.class, () -> new Plmn("310", "26F"));
     }
 }

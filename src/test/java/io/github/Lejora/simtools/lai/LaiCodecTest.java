@@ -9,7 +9,7 @@ class LaiCodecTest {
 
     @Test
     void encodeDecodeRoundTripPreservesFields() {
-        Lai original = new Lai(new Plmn("310", "260", false), 0x1234, false);
+        Lai original = new Lai(new Plmn("310", "260"), 0x1234);
 
         byte[] encoded = LaiCodec.encode(original);
         assertEquals(5, encoded.length);
@@ -17,12 +17,23 @@ class LaiCodecTest {
         Lai decoded = LaiCodec.decode(encoded);
         assertEquals(original.plmn(), decoded.plmn());
         assertEquals(original.lac(), decoded.lac());
-        assertFalse(decoded.deleted());
+        assertFalse(decoded.shouldBeTreatedAsDeleted());
+    }
+
+    @Test
+    void decodeReadsLaiFromOffset() {
+        byte[] bytes = { 0x00, 0x13, 0x00, 0x62, 0x12, 0x34, 0x00 };
+
+        Lai decoded = LaiCodec.decode(bytes, 1);
+
+        assertEquals(new Plmn("310", "260"), decoded.plmn());
+        assertEquals(0x1234, decoded.lac());
+        assertFalse(decoded.shouldBeTreatedAsDeleted());
     }
 
     @Test
     void encodeWithDeletedLacUsesSentinelValue() {
-        Lai original = new Lai(new Plmn("901", "70", false), 0x2222, true);
+        Lai original = new Lai(new Plmn("901", "70"), 0xFFFE);
 
         byte[] encoded = LaiCodec.encode(original);
         assertEquals((byte) 0xFF, encoded[3]);
@@ -30,18 +41,20 @@ class LaiCodecTest {
 
         Lai decoded = LaiCodec.decode(encoded);
         assertEquals(0xFFFE, decoded.lac());
-        assertTrue(decoded.deleted());
+        assertTrue(decoded.hasDeletedLacEncoding());
+        assertTrue(decoded.shouldBeTreatedAsDeleted());
     }
 
     @Test
     void decodeMarksDeletedWhenPlmnIsAbnormal() {
-        Lai original = new Lai(new Plmn("A0A", "B1", true), 0x0102, false);
+        Lai original = new Lai(new Plmn("A0A", "B1"), 0x0102);
 
         byte[] encoded = LaiCodec.encode(original);
         Lai decoded = LaiCodec.decode(encoded);
 
-        assertTrue(decoded.plmn().abnormal());
-        assertTrue(decoded.deleted());
+        assertTrue(decoded.plmn().isAbnormal());
+        assertFalse(decoded.hasDeletedLacEncoding());
+        assertTrue(decoded.shouldBeTreatedAsDeleted());
         assertEquals(0x0102, decoded.lac());
     }
 }
