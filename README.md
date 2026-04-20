@@ -36,13 +36,13 @@ FiveGsTai fiveGsTai = new FiveGsTai(plmn, new FiveGsTac("12ABCD"));
 Ecgi ecgi = new Ecgi(plmn, new Eci("2EEE010"));
 Ncgi ncgi = new Ncgi(plmn, new Nci("123ABC789"));
 
-byte[] plmnBytes = PlmnCodec.encode(plmn);    // -> { 0x13, 0x00, 0x62 }
-byte[] lacBytes = LacCodec.encode(0x1234);    // -> { 0x12, 0x34 }
-byte[] laiBytes = LaiCodec.encode(lai);       // -> { 0x13, 0x00, 0x62, 0x12, 0x34 }
-byte[] epsTaiBytes = EpsTaiCodec.encode(epsTai);
-byte[] fiveGsTaiBytes = FiveGsTaiCodec.encode(fiveGsTai);
-byte[] ecgiBytes = EcgiCodec.encode(ecgi);
-byte[] ncgiBytes = NcgiCodec.encode(ncgi);
+byte[] plmnBytes = PlmnCodec.encode(plmn);           // -> { 0x13, 0x00, 0x62 }
+byte[] lacBytes = LacCodec.encode(0x1234);           // -> { 0x12, 0x34 }
+byte[] laiBytes = LaiCodec.encode(lai);              // -> { 0x13, 0x00, 0x62, 0x12, 0x34 }
+byte[] epsTaiBytes = EpsTaiCodec.encode(epsTai);     // -> { 0x13, 0x00, 0x62, 0x12, 0xAF }
+byte[] fiveGsTaiBytes = FiveGsTaiCodec.encode(fiveGsTai); // -> { 0x13, 0x00, 0x62, 0x12, 0xAB, 0xCD }
+byte[] ecgiBytes = EcgiCodec.encode(ecgi);           // -> { 0x13, 0x00, 0x62, 0x02, 0xEE, 0xE0, 0x10 }
+byte[] ncgiBytes = NcgiCodec.encode(ncgi);           // -> { 0x13, 0x00, 0x62, 0x01, 0x23, 0xAB, 0xC7, 0x89 }
 
 Plmn decodedPlmn = PlmnCodec.decode(plmnBytes, 0);
 Lac decodedLac = LacCodec.decode(lacBytes, 0);
