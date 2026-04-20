@@ -30,6 +30,6 @@ public class LacCodec {
     }
 
     public static byte[] encodeDeleted() {
-        return encode(Lac.deleted().value());
+        return encode(Lac.reserved().value());
     }
 }

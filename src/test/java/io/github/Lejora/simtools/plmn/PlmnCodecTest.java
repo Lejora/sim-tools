@@ -37,7 +37,7 @@ class PlmnCodecTest {
         assertEquals(3, encoded.length);
 
         Plmn decoded = PlmnCodec.decode(encoded, 0);
-        assertTrue(decoded.isAbnormal());
+        assertTrue(decoded.isNonCanonical());
         assertEquals(abnormal, decoded);
     }
 

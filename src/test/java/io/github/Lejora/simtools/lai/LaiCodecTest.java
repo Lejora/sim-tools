@@ -17,7 +17,7 @@ class LaiCodecTest {
         Lai decoded = LaiCodec.decode(encoded);
         assertEquals(original.plmn(), decoded.plmn());
         assertEquals(original.lac(), decoded.lac());
-        assertFalse(decoded.shouldBeTreatedAsDeleted());
+        assertFalse(decoded.representsNoValidIdentity());
     }
 
     @Test
@@ -28,7 +28,7 @@ class LaiCodecTest {
 
         assertEquals(new Plmn("310", "260"), decoded.plmn());
         assertEquals(0x1234, decoded.lac());
-        assertFalse(decoded.shouldBeTreatedAsDeleted());
+        assertFalse(decoded.representsNoValidIdentity());
     }
 
     @Test
@@ -41,8 +41,8 @@ class LaiCodecTest {
 
         Lai decoded = LaiCodec.decode(encoded);
         assertEquals(0xFFFE, decoded.lac());
-        assertTrue(decoded.hasDeletedLacEncoding());
-        assertTrue(decoded.shouldBeTreatedAsDeleted());
+        assertTrue(decoded.hasReservedLac());
+        assertTrue(decoded.representsNoValidIdentity());
     }
 
     @Test
@@ -52,9 +52,9 @@ class LaiCodecTest {
         byte[] encoded = LaiCodec.encode(original);
         Lai decoded = LaiCodec.decode(encoded);
 
-        assertTrue(decoded.plmn().isAbnormal());
-        assertFalse(decoded.hasDeletedLacEncoding());
-        assertTrue(decoded.shouldBeTreatedAsDeleted());
+        assertTrue(decoded.plmn().isNonCanonical());
+        assertFalse(decoded.hasReservedLac());
+        assertTrue(decoded.representsNoValidIdentity());
         assertEquals(0x0102, decoded.lac());
     }
 }

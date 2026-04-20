@@ -16,7 +16,7 @@ class LacCodecTest {
 
             Lac decoded = LacCodec.decode(encoded, 0);
             assertEquals(value, decoded.value());
-            assertFalse(decoded.isDeletedEncoding());
+            assertFalse(decoded.isReserved());
         }
     }
 
@@ -27,7 +27,7 @@ class LacCodecTest {
 
         Lac decoded = LacCodec.decode(encoded, 0);
         assertEquals(0xFFFE, decoded.value());
-        assertTrue(decoded.isDeletedEncoding());
+        assertTrue(decoded.isReserved());
     }
 
     @Test
@@ -36,6 +36,6 @@ class LacCodecTest {
 
         Lac decoded = LacCodec.decode(deletedBytes, 0);
         assertEquals(0x0000, decoded.value());
-        assertTrue(decoded.isDeletedEncoding());
+        assertTrue(decoded.isReserved());
     }
 }

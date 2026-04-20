@@ -32,8 +32,13 @@ public record Plmn(String mcc, String mnc) {
         mnc = mnc.toUpperCase(Locale.ROOT);
     }
 
-    public boolean isAbnormal() {
+    public boolean isNonCanonical() {
         return !isDecimalDigits(mcc) || !isDecimalDigits(mnc);
+    }
+
+    @Deprecated
+    public boolean isAbnormal() {
+        return isNonCanonical();
     }
 
     private static boolean isHexDigits(String value) {
